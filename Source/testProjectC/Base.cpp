@@ -43,8 +43,9 @@ ABase::ABase()
 	Dragon_Sword->SetRelativeRotation(FRotator::ZeroRotator);
 	NextUUID = 0;
 	WeaponDrawn = false;
-	LightAttacked = false;
-	HeavyAttacked = false;
+	MovementOn = true;
+	//LightAttacked = false;
+	//HeavyAttacked = false;
 }
 
 // Called when the game starts or when spawned
@@ -75,6 +76,7 @@ void ABase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("Draw Weapon", IE_Pressed, this, &ABase::DrawWeapon);
 	PlayerInputComponent->BindAction("Light Attack", IE_Pressed, this, &ABase::StartLightAttack1);
+	PlayerInputComponent->BindAction("Heavy Attack", IE_Pressed, this, &ABase::StartHeavyAttack1);
 
 }
 
@@ -84,10 +86,7 @@ bool ABase::InvertBoolean(bool value)
 	{
 		return false;
 	}
-	else
-	{
-		return true;
-	}
+	return true;
 }
 
 int32 ABase::GetNextUUID()
@@ -97,14 +96,20 @@ int32 ABase::GetNextUUID()
 
 void ABase::MoveForward(float AxisValue)
 {
-	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
-	AddMovementInput(Direction, AxisValue);
+	if (MovementOn == true)
+	{
+		FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
+		AddMovementInput(Direction, AxisValue);
+	}
 }
 
 void ABase::MoveRight(float AxisValue)
 {
-	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
-	AddMovementInput(Direction, AxisValue);
+	if (MovementOn == true)
+	{
+		FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
+		AddMovementInput(Direction, AxisValue);
+	}
 }
 
 void ABase::ToggleWalkRun()
@@ -192,11 +197,13 @@ void ABase::DrawWeapon()
 				info.CallbackTarget = this;
 				info.Linkage = 0;
 				info.UUID = GetNextUUID();
+				/*
 				if (LightAttacked == true)
 				{
 					info.ExecutionFunction = FName("PlayLightAttack1Montage");
 					LightAttacked = false;
 				}
+				*/
 				UKismetSystemLibrary::MoveComponentTo(Dragon_Sword, FVector::ZeroVector, FRotator::ZeroRotator, false, false, 0.3f, false, EMoveComponentAction::Move,info);
 			});
 		}
@@ -226,6 +233,7 @@ void ABase::WeaponOn_Implementation(bool drawn)
 
 }
 
+/*
 void ABase::PlayLightAttack1Montage()
 {
 	if (Light_Attack_1_Montage)
@@ -233,17 +241,35 @@ void ABase::PlayLightAttack1Montage()
 		PlayAnimMontage(Light_Attack_1_Montage, 1.0f);
 	}
 }
+*/
 
 void ABase::StartLightAttack1()
 {
-	LightAttacked = true;
+	//LightAttacked = true;
 	if (WeaponDrawn == true)
 	{
-		PlayLightAttack1Montage();
-		LightAttacked = false;
+		PlayAnimMontage(Light_Attack_1_Montage, 1.6f);
+		//LightAttacked = false;
 	}
 	else
 	{
 		WeaponOn(true);
 	}
+}
+
+void ABase::StartHeavyAttack1()
+{
+	if (WeaponDrawn == true)
+	{
+		PlayAnimMontage(Heavy_Attack_1_Montage, 1.0f);
+	}
+	else
+	{
+		WeaponOn(true);
+	}
+}
+
+void ABase::Movement_Implementation(bool on)
+{
+	MovementOn = on;
 }

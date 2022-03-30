@@ -33,4 +33,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Meta = (AllowPrivateAccess = true))
 	void WeaponOn(bool drawn);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Meta = (AllowPrivateAccess = true))
+	void Movement(bool on);
 };

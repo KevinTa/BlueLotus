@@ -51,10 +51,15 @@ class TESTPROJECTC_API ABase : public ACharacter, public IInterface_CharacterAct
 	bool WeaponDrawn;
 
 	UPROPERTY()
+	bool MovementOn;
+
+	/*
+	UPROPERTY()
 	bool LightAttacked;
 
 	UPROPERTY()
 	bool HeavyAttacked;
+	*/
 
 public:
 	// Sets default values for this character's properties
@@ -125,9 +130,15 @@ public:
 	class UAnimMontage* Heavy_Attack_1_Montage;
 
 	//Helper function to play light attack montage and can be used as a callback function
-	UFUNCTION()
-	void PlayLightAttack1Montage();
+	//UFUNCTION()
+	//void PlayLightAttack1Montage();
 
 	UFUNCTION()
 	void StartLightAttack1();
+
+	UFUNCTION()
+	void StartHeavyAttack1();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Meta = (AllowPrivateAccess = true))
+	void Movement(bool on); virtual void Movement_Implementation(bool on) override;
 };
