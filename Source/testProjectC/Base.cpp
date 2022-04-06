@@ -44,8 +44,6 @@ ABase::ABase()
 	NextUUID = 0;
 	WeaponDrawn = false;
 	MovementOn = true;
-	//LightAttacked = false;
-	//HeavyAttacked = false;
 }
 
 // Called when the game starts or when spawned
@@ -80,15 +78,6 @@ void ABase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-bool ABase::InvertBoolean(bool value)
-{
-	if (value == true)
-	{
-		return false;
-	}
-	return true;
-}
-
 int32 ABase::GetNextUUID()
 {
 	return NextUUID++;
@@ -114,7 +103,7 @@ void ABase::MoveRight(float AxisValue)
 
 void ABase::ToggleWalkRun()
 {
-	Running = InvertBoolean(Running);
+	Running = !Running;
 	if (Running == true)
 	{
 		CrouchOn(false);
@@ -128,7 +117,7 @@ void ABase::ToggleWalkRun()
 
 void ABase::RunOn_Implementation(bool enabled)
 {
-	Running = InvertBoolean(enabled);
+	Running = !enabled;
 	ToggleWalkRun();
 }
 
@@ -159,7 +148,7 @@ void ABase::SprintOn_Implementation(bool enabled)
 
 void ABase::ToggleCrouching()
 {
-	IsCrouching = InvertBoolean(IsCrouching);
+	IsCrouching = !IsCrouching;
 	if (IsCrouching == true)
 	{
 		RunOn(false);
@@ -177,7 +166,7 @@ void ABase::ToggleCrouching()
 
 void ABase::CrouchOn_Implementation(bool enabled)
 {
-	IsCrouching = InvertBoolean(enabled);
+	IsCrouching = !enabled;
 	ToggleCrouching();
 }
 
@@ -185,7 +174,7 @@ void ABase::DrawWeapon()
 {
 	if (Equip_Weapon_Montage)
 	{
-		WeaponDrawn = InvertBoolean(WeaponDrawn);
+		WeaponDrawn = !WeaponDrawn;
 		PlayAnimMontage(Equip_Weapon_Montage, 2.0f);
 		FLatentActionInfo info;
 		FTimerDelegate TimerDelegate;
@@ -197,13 +186,6 @@ void ABase::DrawWeapon()
 				info.CallbackTarget = this;
 				info.Linkage = 0;
 				info.UUID = GetNextUUID();
-				/*
-				if (LightAttacked == true)
-				{
-					info.ExecutionFunction = FName("PlayLightAttack1Montage");
-					LightAttacked = false;
-				}
-				*/
 				UKismetSystemLibrary::MoveComponentTo(Dragon_Sword, FVector::ZeroVector, FRotator::ZeroRotator, false, false, 0.3f, false, EMoveComponentAction::Move,info);
 			});
 		}
@@ -227,29 +209,17 @@ void ABase::WeaponOn_Implementation(bool drawn)
 {
 	if (Equip_Weapon_Montage)
 	{
-		WeaponDrawn = InvertBoolean(drawn);
+		WeaponDrawn = !drawn;
 		DrawWeapon();
 	}
 
 }
 
-/*
-void ABase::PlayLightAttack1Montage()
-{
-	if (Light_Attack_1_Montage)
-	{
-		PlayAnimMontage(Light_Attack_1_Montage, 1.0f);
-	}
-}
-*/
-
 void ABase::StartLightAttack1()
 {
-	//LightAttacked = true;
 	if (WeaponDrawn == true)
 	{
 		PlayAnimMontage(Light_Attack_1_Montage, 1.6f);
-		//LightAttacked = false;
 	}
 	else
 	{

@@ -76,10 +76,6 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	//Helper Function to Invert a boolean value when called instead repeatedly writing if-else statements to do so
-	UFUNCTION()
-	bool InvertBoolean(bool value);
-
 	//Helper Function to get a unique UUID for Latent Actions
 	UFUNCTION()
 	int32 GetNextUUID();
