@@ -53,13 +53,11 @@ class TESTPROJECTC_API ABase : public ACharacter, public IInterface_CharacterAct
 	UPROPERTY()
 	bool MovementOn;
 
-	/*
 	UPROPERTY()
-	bool LightAttacked;
+	int AttackCounter;
 
 	UPROPERTY()
-	bool HeavyAttacked;
-	*/
+	bool LightAttackOnce;
 
 public:
 	// Sets default values for this character's properties
@@ -123,11 +121,19 @@ public:
 	class UAnimMontage* Light_Attack_1_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Assets")
+	class UAnimMontage* Light_Attack_2_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Assets")
+	class UAnimMontage* Light_Attack_3_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Assets")
 	class UAnimMontage* Heavy_Attack_1_Montage;
 
-	//Helper function to play light attack montage and can be used as a callback function
-	//UFUNCTION()
-	//void PlayLightAttack1Montage();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Assets")
+	class UAnimMontage* Heavy_Attack_2_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Assets")
+	class UAnimMontage* Heavy_Attack_3_Montage;
 
 	UFUNCTION()
 	void StartLightAttack1();

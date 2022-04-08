@@ -44,6 +44,8 @@ ABase::ABase()
 	NextUUID = 0;
 	WeaponDrawn = false;
 	MovementOn = true;
+	AttackCounter = 0;
+	LightAttackOnce = false;
 }
 
 // Called when the game starts or when spawned
@@ -85,7 +87,7 @@ int32 ABase::GetNextUUID()
 
 void ABase::MoveForward(float AxisValue)
 {
-	if (MovementOn == true)
+	if (MovementOn)
 	{
 		FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
 		AddMovementInput(Direction, AxisValue);
@@ -94,7 +96,7 @@ void ABase::MoveForward(float AxisValue)
 
 void ABase::MoveRight(float AxisValue)
 {
-	if (MovementOn == true)
+	if (MovementOn)
 	{
 		FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
 		AddMovementInput(Direction, AxisValue);
@@ -104,7 +106,7 @@ void ABase::MoveRight(float AxisValue)
 void ABase::ToggleWalkRun()
 {
 	Running = !Running;
-	if (Running == true)
+	if (Running)
 	{
 		CrouchOn(false);
 		Character_Movement->MaxWalkSpeed = 600.0f;
@@ -136,7 +138,7 @@ void ABase::UnSetSprint()
 
 void ABase::SprintOn_Implementation(bool enabled)
 {
-	if (enabled == true)
+	if (enabled)
 	{
 		SetSprint();
 	}
@@ -149,7 +151,7 @@ void ABase::SprintOn_Implementation(bool enabled)
 void ABase::ToggleCrouching()
 {
 	IsCrouching = !IsCrouching;
-	if (IsCrouching == true)
+	if (IsCrouching)
 	{
 		RunOn(false);
 		Crouch();
@@ -178,7 +180,7 @@ void ABase::DrawWeapon()
 		PlayAnimMontage(Equip_Weapon_Montage, 2.0f);
 		FLatentActionInfo info;
 		FTimerDelegate TimerDelegate;
-		if (WeaponDrawn == true)
+		if (WeaponDrawn)
 		{
 			TimerDelegate.BindLambda([&]
 			{
@@ -217,19 +219,53 @@ void ABase::WeaponOn_Implementation(bool drawn)
 
 void ABase::StartLightAttack1()
 {
-	if (WeaponDrawn == true)
+	if (!LightAttackOnce)
 	{
-		PlayAnimMontage(Light_Attack_1_Montage, 1.6f);
+		if (WeaponDrawn)
+		{
+			switch (AttackCounter) {
+			case 0:
+				PlayAnimMontage(Light_Attack_1_Montage, 1.6f);
+				break;
+			case 1:
+				PlayAnimMontage(Light_Attack_2_Montage, 1.6f);
+				break;
+			case 2:
+				PlayAnimMontage(Light_Attack_3_Montage, 1.6f);
+				break;
+			}
+			AttackCounter++;
+			FTimerDelegate TimerDelegate;
+			TimerDelegate.BindLambda([&]
+				{
+					LightAttackOnce = false;
+					FTimerDelegate TimerDelegate2;
+					TimerDelegate2.BindLambda([&]
+						{
+							if (!LightAttackOnce)
+							{
+								AttackCounter = 0;
+							}
+						});
+					FTimerHandle TimerHandle2;
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle2, TimerDelegate2, 0.5f, false);
+
+				});
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.5f, false);
+			LightAttackOnce = true;
+		}
+		else
+		{
+			WeaponOn(true);
+		}
 	}
-	else
-	{
-		WeaponOn(true);
-	}
+	
 }
 
 void ABase::StartHeavyAttack1()
 {
-	if (WeaponDrawn == true)
+	if (WeaponDrawn)
 	{
 		PlayAnimMontage(Heavy_Attack_1_Montage, 1.0f);
 	}
