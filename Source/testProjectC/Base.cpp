@@ -46,6 +46,7 @@ ABase::ABase()
 	MovementOn = true;
 	AttackCounter = 0;
 	LightAttackOnce = false;
+	HeavyAttackOnce = false;
 }
 
 // Called when the game starts or when spawned
@@ -216,49 +217,109 @@ void ABase::WeaponOn_Implementation(bool drawn)
 	}
 
 }
-
-void ABase::StartLightAttack1()
+void ABase::SetLightAttack1Delay(int select)
 {
-	if (!LightAttackOnce)
-	{
-		if (WeaponDrawn)
+	AttackCounter++;
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindLambda([&]
 		{
-			switch (AttackCounter) {
-			case 0:
-				PlayAnimMontage(Light_Attack_1_Montage, 1.6f);
-				break;
-			case 1:
-				PlayAnimMontage(Light_Attack_2_Montage, 1.6f);
-				break;
-			case 2:
-				PlayAnimMontage(Light_Attack_3_Montage, 1.6f);
-				break;
-			}
-			AttackCounter++;
-			FTimerDelegate TimerDelegate;
-			TimerDelegate.BindLambda([&]
+			LightAttackOnce = false;
+			FTimerDelegate TimerDelegate2;
+			TimerDelegate2.BindLambda([&]
 				{
-					LightAttackOnce = false;
-					FTimerDelegate TimerDelegate2;
-					TimerDelegate2.BindLambda([&]
+					if (!LightAttackOnce)
+					{
+						if (select == 0)
 						{
-							if (!LightAttackOnce)
+							if (AttackCounter <= 1)
 							{
 								AttackCounter = 0;
 							}
-						});
-					FTimerHandle TimerHandle2;
-					GetWorld()->GetTimerManager().SetTimer(TimerHandle2, TimerDelegate2, 0.5f, false);
-
+						}
+						else
+						{
+							AttackCounter = 0;
+						}
+					}
 				});
-			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.5f, false);
-			LightAttackOnce = true;
-		}
-		else
+			FTimerHandle TimerHandle2;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle2, TimerDelegate2, 0.5f, false);
+
+		});
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.5f, false);
+	LightAttackOnce = true;
+}
+
+void ABase::SetHeavyAttack1Delay(int select)
+{
+	AttackCounter++;
+	FTimerDelegate TimerDelegate3;
+	TimerDelegate3.BindLambda([&]
 		{
-			WeaponOn(true);
+			HeavyAttackOnce = false;
+			FTimerDelegate TimerDelegate4;
+			TimerDelegate4.BindLambda([&]
+				{
+					if (!HeavyAttackOnce)
+					{
+						if (select == 0)
+						{
+							if (AttackCounter <= 1)
+							{
+								AttackCounter = 0;
+							}
+						}
+						else
+						{
+							AttackCounter = 0;
+						}
+					}
+				});
+			FTimerHandle TimerHandle4;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle4, TimerDelegate4, 0.8f, false);
+
+		});
+	FTimerHandle TimerHandle3;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle3, TimerDelegate3, 0.8f, false);
+	HeavyAttackOnce = true;
+}
+
+void ABase::StartLightAttack1()
+{
+	if (WeaponDrawn)
+	{
+		if (!LightAttackOnce)
+		{
+			FTimerDelegate TimerDelegate5;
+			TimerDelegate5.BindLambda([&]
+				{
+					AttackCounter = 0;
+					LightAttackOnce = false;
+				});
+			FTimerHandle TimerHandle5;
+			switch (AttackCounter) {
+			case 0:
+				PlayAnimMontage(Light_Attack_1_Montage, 1.6f);
+				SetLightAttack1Delay(0);
+				break;
+			case 1:
+				PlayAnimMontage(Light_Attack_2_Montage, 1.6f);
+				SetLightAttack1Delay(1);
+				break;
+			case 2:
+				PlayAnimMontage(Light_Attack_3_Montage, 1.6f);
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle5, TimerDelegate5, 0.7f, false);
+				break;
+			default:
+				SetLightAttack1Delay(-1);
+				break;
+			}
 		}
+	}
+	else
+	{
+		WeaponOn(true);
 	}
 	
 }
@@ -267,7 +328,33 @@ void ABase::StartHeavyAttack1()
 {
 	if (WeaponDrawn)
 	{
-		PlayAnimMontage(Heavy_Attack_1_Montage, 1.0f);
+		if (!HeavyAttackOnce)
+		{
+			FTimerDelegate TimerDelegate6;
+			TimerDelegate6.BindLambda([&]
+				{
+					AttackCounter = 0;
+					HeavyAttackOnce = false;
+				});
+			FTimerHandle TimerHandle6;
+			switch (AttackCounter) {
+			case 0:
+				PlayAnimMontage(Heavy_Attack_1_Montage, 1.0f);
+				SetLightAttack1Delay(0);
+				break;
+			case 1:
+				PlayAnimMontage(Heavy_Attack_2_Montage, 1.0f);
+				SetLightAttack1Delay(1);
+				break;
+			case 2:
+				PlayAnimMontage(Heavy_Attack_3_Montage, 1.0f);
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle6, TimerDelegate6, 1.0f, false);
+				break;
+			default:
+				SetLightAttack1Delay(-1);
+				break;
+			}
+		}
 	}
 	else
 	{

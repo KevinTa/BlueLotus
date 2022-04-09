@@ -59,6 +59,9 @@ class TESTPROJECTC_API ABase : public ACharacter, public IInterface_CharacterAct
 	UPROPERTY()
 	bool LightAttackOnce;
 
+	UPROPERTY()
+	bool HeavyAttackOnce;
+
 public:
 	// Sets default values for this character's properties
 	ABase();
@@ -136,7 +139,13 @@ public:
 	class UAnimMontage* Heavy_Attack_3_Montage;
 
 	UFUNCTION()
+	void SetLightAttack1Delay(int select);
+
+	UFUNCTION()
 	void StartLightAttack1();
+
+	UFUNCTION()
+	void SetHeavyAttack1Delay(int select);
 
 	UFUNCTION()
 	void StartHeavyAttack1();
