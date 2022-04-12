@@ -57,10 +57,7 @@ class TESTPROJECTC_API ABase : public ACharacter, public IInterface_CharacterAct
 	int AttackCounter;
 
 	UPROPERTY()
-	bool LightAttackOnce;
-
-	UPROPERTY()
-	bool HeavyAttackOnce;
+	bool ComboMode;
 
 public:
 	// Sets default values for this character's properties

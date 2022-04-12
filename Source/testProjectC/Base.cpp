@@ -45,8 +45,7 @@ ABase::ABase()
 	WeaponDrawn = false;
 	MovementOn = true;
 	AttackCounter = 0;
-	LightAttackOnce = false;
-	HeavyAttackOnce = false;
+	ComboMode = false;
 }
 
 // Called when the game starts or when spawned
@@ -219,85 +218,84 @@ void ABase::WeaponOn_Implementation(bool drawn)
 }
 void ABase::SetLightAttack1Delay(int select)
 {
-	AttackCounter++;
+	float duration1 = 0.7f;
+	float duration2 = 0.7f;
+	switch (select)
+	{
+	case 0:
+		duration1 = 0.6f;
+		duration2 = 0.5f;
+	case 1:
+		duration1 = 0.5f;
+		duration2 = 1.0f;
+	case 2:
+		duration1 = 0.5f;
+		duration2 = 1.0f;
+	}
 	FTimerDelegate TimerDelegate;
 	TimerDelegate.BindLambda([&]
 		{
-			LightAttackOnce = false;
+			AttackCounter++;
+			ComboMode = false;
 			FTimerDelegate TimerDelegate2;
 			TimerDelegate2.BindLambda([&]
 				{
-					if (!LightAttackOnce)
+					if (!ComboMode)
 					{
-						if (select == 0)
-						{
-							if (AttackCounter <= 1)
-							{
-								AttackCounter = 0;
-							}
-						}
-						else
-						{
-							AttackCounter = 0;
-						}
+						AttackCounter = 0;
 					}
 				});
 			FTimerHandle TimerHandle2;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle2, TimerDelegate2, 0.5f, false);
-
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle2, TimerDelegate2, duration2, false);
 		});
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.5f, false);
-	LightAttackOnce = true;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, duration1, false);
+	
 }
 
 void ABase::SetHeavyAttack1Delay(int select)
 {
-	AttackCounter++;
+	float duration1 = 0.8f;
+	float duration2 = 0.8f;
+	switch (select)
+	{
+	case 0:
+		duration1 = 0.8f;
+		duration2 = 0.8f;
+	case 1:
+		duration1 = 0.8f;
+		duration2 = 2.0f;
+	case 2:
+		duration1 = 0.8f;
+		duration2 = 1.0f;
+	}
 	FTimerDelegate TimerDelegate3;
 	TimerDelegate3.BindLambda([&]
 		{
-			HeavyAttackOnce = false;
+			AttackCounter++;
+			ComboMode = false;
+			
 			FTimerDelegate TimerDelegate4;
 			TimerDelegate4.BindLambda([&]
 				{
-					if (!HeavyAttackOnce)
+					if (!ComboMode)
 					{
-						if (select == 0)
-						{
-							if (AttackCounter <= 1)
-							{
-								AttackCounter = 0;
-							}
-						}
-						else
-						{
-							AttackCounter = 0;
-						}
+						AttackCounter = 0;
 					}
 				});
 			FTimerHandle TimerHandle4;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle4, TimerDelegate4, 0.8f, false);
-
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle4, TimerDelegate4, duration2, false);
 		});
 	FTimerHandle TimerHandle3;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle3, TimerDelegate3, 0.8f, false);
-	HeavyAttackOnce = true;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle3, TimerDelegate3, duration1, false);
 }
 
 void ABase::StartLightAttack1()
 {
 	if (WeaponDrawn)
 	{
-		if (!LightAttackOnce)
+		if (!ComboMode)
 		{
-			FTimerDelegate TimerDelegate5;
-			TimerDelegate5.BindLambda([&]
-				{
-					AttackCounter = 0;
-					LightAttackOnce = false;
-				});
-			FTimerHandle TimerHandle5;
 			switch (AttackCounter) {
 			case 0:
 				PlayAnimMontage(Light_Attack_1_Montage, 1.6f);
@@ -309,12 +307,16 @@ void ABase::StartLightAttack1()
 				break;
 			case 2:
 				PlayAnimMontage(Light_Attack_3_Montage, 1.6f);
-				GetWorld()->GetTimerManager().SetTimer(TimerHandle5, TimerDelegate5, 0.7f, false);
+				SetLightAttack1Delay(2);
 				break;
 			default:
-				SetLightAttack1Delay(-1);
+				AttackCounter = 0;
+				PlayAnimMontage(Light_Attack_1_Montage, 1.6f);
+				SetLightAttack1Delay(0);
 				break;
 			}
+
+			ComboMode = true;
 		}
 	}
 	else
@@ -328,32 +330,28 @@ void ABase::StartHeavyAttack1()
 {
 	if (WeaponDrawn)
 	{
-		if (!HeavyAttackOnce)
+		if (!ComboMode)
 		{
-			FTimerDelegate TimerDelegate6;
-			TimerDelegate6.BindLambda([&]
-				{
-					AttackCounter = 0;
-					HeavyAttackOnce = false;
-				});
-			FTimerHandle TimerHandle6;
 			switch (AttackCounter) {
 			case 0:
 				PlayAnimMontage(Heavy_Attack_1_Montage, 1.0f);
-				SetLightAttack1Delay(0);
+				SetHeavyAttack1Delay(0);
 				break;
 			case 1:
 				PlayAnimMontage(Heavy_Attack_2_Montage, 1.0f);
-				SetLightAttack1Delay(1);
+				SetHeavyAttack1Delay(1);
 				break;
 			case 2:
 				PlayAnimMontage(Heavy_Attack_3_Montage, 1.0f);
-				GetWorld()->GetTimerManager().SetTimer(TimerHandle6, TimerDelegate6, 1.0f, false);
+				SetHeavyAttack1Delay(2);
 				break;
 			default:
-				SetLightAttack1Delay(-1);
+				AttackCounter = 0;
+				PlayAnimMontage(Heavy_Attack_1_Montage, 1.0f);
+				SetHeavyAttack1Delay(1);
 				break;
 			}
+			ComboMode = true;
 		}
 	}
 	else
