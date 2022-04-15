@@ -216,7 +216,9 @@ void ABase::WeaponOn_Implementation(bool drawn)
 	}
 
 }
-void ABase::SetLightAttack1Delay(int select)
+
+//Helper Function to set delay during attack animations
+void ABase::SetAttackDelay(int select)
 {
 	float duration1 = 0.7f;
 	float duration2 = 0.7f;
@@ -230,6 +232,15 @@ void ABase::SetLightAttack1Delay(int select)
 		duration2 = 1.0f;
 	case 2:
 		duration1 = 0.5f;
+		duration2 = 1.0f;
+	case 3:
+		duration1 = 0.8f;
+		duration2 = 0.8f;
+	case 4:
+		duration1 = 0.8f;
+		duration2 = 2.0f;
+	case 5:
+		duration1 = 0.8f;
 		duration2 = 1.0f;
 	}
 	FTimerDelegate TimerDelegate;
@@ -253,42 +264,6 @@ void ABase::SetLightAttack1Delay(int select)
 	
 }
 
-void ABase::SetHeavyAttack1Delay(int select)
-{
-	float duration1 = 0.8f;
-	float duration2 = 0.8f;
-	switch (select)
-	{
-	case 0:
-		duration1 = 0.8f;
-		duration2 = 0.8f;
-	case 1:
-		duration1 = 0.8f;
-		duration2 = 2.0f;
-	case 2:
-		duration1 = 0.8f;
-		duration2 = 1.0f;
-	}
-	FTimerDelegate TimerDelegate3;
-	TimerDelegate3.BindLambda([&]
-		{
-			AttackCounter++;
-			ComboMode = false;
-			
-			FTimerDelegate TimerDelegate4;
-			TimerDelegate4.BindLambda([&]
-				{
-					if (!ComboMode)
-					{
-						AttackCounter = 0;
-					}
-				});
-			FTimerHandle TimerHandle4;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle4, TimerDelegate4, duration2, false);
-		});
-	FTimerHandle TimerHandle3;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle3, TimerDelegate3, duration1, false);
-}
 
 void ABase::StartLightAttack1()
 {
@@ -299,20 +274,20 @@ void ABase::StartLightAttack1()
 			switch (AttackCounter) {
 			case 0:
 				PlayAnimMontage(Light_Attack_1_Montage, 1.6f);
-				SetLightAttack1Delay(0);
+				SetAttackDelay(0);
 				break;
 			case 1:
 				PlayAnimMontage(Light_Attack_2_Montage, 1.6f);
-				SetLightAttack1Delay(1);
+				SetAttackDelay(1);
 				break;
 			case 2:
 				PlayAnimMontage(Light_Attack_3_Montage, 1.6f);
-				SetLightAttack1Delay(2);
+				SetAttackDelay(2);
 				break;
 			default:
 				AttackCounter = 0;
 				PlayAnimMontage(Light_Attack_1_Montage, 1.6f);
-				SetLightAttack1Delay(0);
+				SetAttackDelay(0);
 				break;
 			}
 
@@ -335,20 +310,20 @@ void ABase::StartHeavyAttack1()
 			switch (AttackCounter) {
 			case 0:
 				PlayAnimMontage(Heavy_Attack_1_Montage, 1.0f);
-				SetHeavyAttack1Delay(0);
+				SetAttackDelay(3);
 				break;
 			case 1:
 				PlayAnimMontage(Heavy_Attack_2_Montage, 1.0f);
-				SetHeavyAttack1Delay(1);
+				SetAttackDelay(4);
 				break;
 			case 2:
 				PlayAnimMontage(Heavy_Attack_3_Montage, 1.0f);
-				SetHeavyAttack1Delay(2);
+				SetAttackDelay(5);
 				break;
 			default:
 				AttackCounter = 0;
 				PlayAnimMontage(Heavy_Attack_1_Montage, 1.0f);
-				SetHeavyAttack1Delay(1);
+				SetAttackDelay(3);
 				break;
 			}
 			ComboMode = true;
